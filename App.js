@@ -1,21 +1,48 @@
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { Text, View } from 'react-native';
 
-export default function App() {
+import firebaseSetup from './src/firebase.config';
+import useFirebaseAuth from './src/hooks/useFirebaseAuth';
+
+import LandingScreen from './src/screens/Landing';
+import RegisterScreen from './src/screens/Register';
+import LoginScreen from './src/screens/Login';
+
+const Stack = createStackNavigator();
+firebaseSetup();
+
+const App = () => {
+  const [loaded, loggedIn] = useFirebaseAuth();
+
+  if (!loaded)
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>Page loading...</Text>
+      </View>
+    );
+
+  if (loggedIn)
+    return (
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Landing">
+          <Stack.Screen
+            name="Landing"
+            component={LandingScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen name="Register" component={RegisterScreen} />
+          <Stack.Screen name="Login" component={LoginScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    );
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text>User is already logged in</Text>
     </View>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
